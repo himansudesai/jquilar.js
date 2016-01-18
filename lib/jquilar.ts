@@ -83,6 +83,7 @@ export class jqUIlarDatePicker {
     }
   }
 
+
   ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
     for (let change in changes) {
       this[change] = changes[change] ? changes[change].currentValue : this[change];
