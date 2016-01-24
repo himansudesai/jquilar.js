@@ -14,6 +14,8 @@ Currently tested with:
 ### Supported Widgets (more coming soon)
 - Slider
 - Date Picker
+- Progress Bar
+- Sortable
 
 
 The examples can be viewed online at himansudesai.github.com/jquilar
