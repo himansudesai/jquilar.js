@@ -182,7 +182,6 @@ export class jqUIlarSortable {
   }
 
   ngAfterContentInit() {
-    console.log('ngAfterContentInit for sortable');
     if (!this.sortable) {
       this.sortable = $(this.domElement).find('.jquilar-sortable');
       for (let i=0; i<this.list.length; i++) {
@@ -197,7 +196,6 @@ export class jqUIlarSortable {
   }
 
   ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
-    console.log('ngOnChanges for sortable');
     for (let change in changes) {
       this[change] = changes[change] ? changes[change].currentValue : this[change];
     }
@@ -209,6 +207,91 @@ export class jqUIlarSortable {
     $(this.sortable).sortable({
       stop: (x, ui) => {
         this.sort.next(x);
+      }
+    });
+  }
+}
+
+
+// jquery-ui menu
+@Component({
+  selector: 'jquilar-menu',
+  inputs: ['menu'],
+  events: ['select'],
+  template: '<div></div>'
+})
+
+export class jqUIlarMenu {
+  menu: Array<string>;
+  select: EventEmitter<string>;
+  domElement: any;
+  jqMenu: any;
+
+  constructor( @Inject(ElementRef) elementRef: ElementRef) {
+    this.domElement = elementRef.nativeElement;
+    this.select = new EventEmitter();
+    this.menu = [];
+    this.jqMenu = undefined;
+  }
+
+  ngAfterContentInit() {
+    console.log('MENU - ngAfterContentInit');
+  }
+
+  buildSubMenuStr(subMenu) {
+    var subStr = '<ul>';
+    for (var i=0; i<subMenu.length; i++) {
+      var item = subMenu[i];
+      if (typeof item === 'string') {
+        subStr += '<li>' + item + '</li>';
+      } else {
+        if (typeof item === 'object') {
+          var label = (Object.keys(item))[0];
+          var value = item[label];
+          if (Array.isArray(value)) {
+            subStr += '<li>' + label + this.buildSubMenuStr(value) + '</li>';
+          } else {
+            subStr += '<li class="ui-state-disabled">' + label + '</li>';
+          }
+        }
+      }
+    }
+    return (subStr + '</ul>');
+  }
+
+  ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
+    console.log('ngOnChanges for menu');
+    for (let change in changes) {
+      this[change] = changes[change] ? changes[change].currentValue : this[change];
+    }
+    this.jqMenu = $(this.domElement).empty().append('<ul class="jquilar-menu"></ul>');
+    this.jqMenu = $(this.jqMenu).find(".jquilar-menu");
+
+    for (var i=0; i<this.menu.length; i++) {
+      var item = this.menu[i];
+      if (typeof item === 'string') {
+        $(this.jqMenu).append('<li>' + item + '</li>');
+      } else {
+        if (typeof item === 'object') {
+          var label = (Object.keys(item))[0];
+          var value = item[label];
+          if (Array.isArray(value)) {
+            $(this.jqMenu).append('<li>' + label + this.buildSubMenuStr(value) + '</li>');
+          } else {
+            $(this.jqMenu).append('<li class="ui-state-disabled">' + label + '</li>');
+          }
+        }
+      }
+    }
+
+
+    $(this.jqMenu).menu({
+      select: (event, ui) => {
+        var selectedItem = event.currentTarget.innerHTML;
+        var numChildren = $(event.currentTarget).children().length;
+        if (numChildren < 1) { // if real children then user selected non leaf element
+          this.select.next(selectedItem);
+        }
       }
     });
   }
