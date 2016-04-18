@@ -35,7 +35,7 @@ export class jqUIlarSlider {
       this[change] = changes[change] ? changes[change].currentValue : this[change];
     }
     if (!this.slider) {
-      this.slider = this.domElement.querySelectorAll('.jquilar-slider');
+      this.slider = $(this.domElement).find('.jquilar-slider');
       $(this.slider).slider({
         stop: ( event, ui ) => {
           this.stop.next(ui.value);
@@ -305,8 +305,7 @@ export class jqUIlarMenu {
 }
 
 
-
-// Effect
+// jquery-ui effect
 @Component({
   selector: 'jquilar-effect',
   inputs: ['effectsHandle'],
@@ -339,7 +338,6 @@ export class jqUIlarEffect {
     };
 
     for (let change in changes) {
-      console.log('attr/val = ' + change + '/' + changes[change].currentValue);
       this[change] = changes[change] ? changes[change].currentValue : this[change];
     }
     this.effectsHandle.runEffect = (effectType, option1, option2, option3, option4) => {
@@ -350,5 +348,86 @@ export class jqUIlarEffect {
       var child = $(this.domElement).children()[0];
       $(child).fadeIn();
     }
+  }
+}
+
+
+// jquery-ui accordion
+@Component({
+  selector: 'jquilar-accordion',
+  inputs: ['sections'],
+  template: `
+              <div class="jquilar-accordion">
+                <ng-content></ng-content>
+              </div>
+            `
+})
+
+export class jqUIlarAccordion {
+  sections: Array<Map<string, string>>;
+  domElement: any;
+  accordion: any;
+
+  constructor( @Inject(ElementRef) elementRef: ElementRef) {
+    this.domElement = elementRef.nativeElement;
+    this.accordion = undefined;
+    this.sections = [];
+  }
+
+  ngAfterContentInit() {
+     this.accordion = $(this.domElement).find('.jquilar-accordion');
+      $(this.accordion).accordion();
+  }
+
+  ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
+    for (let change in changes) {
+      this[change] = changes[change] ? changes[change].currentValue : this[change];
+    }
+    this.accordion = $(this.domElement).empty().append('<div class="jquilar-accordion"></div>');
+    this.accordion = $(this.accordion).find(".jquilar-accordion");
+    for (var idx=0; idx<this.sections.length; idx++) {
+      var section = this.sections[idx];
+      $(this.accordion).append('<h3>' + section.heading + '</h3>');
+      $(this.accordion).append('<div>' + section.body + '</div>');
+    }
+    $(this.accordion).accordion();
+  }
+}
+
+// jquery-ui tooltip
+@Component({
+  selector: 'jquilar-tooltip',
+  inputs: ['tooltip'],
+  template: `
+              <div class="jquilar-tooltip">
+                <ng-content></ng-content>
+              </div>
+            `
+})
+
+export class jqUIlarTooltip {
+  tooltip: String;
+  domElement: any;
+  jqTooltip: any;
+
+  constructor( @Inject(ElementRef) elementRef: ElementRef) {
+    this.domElement = elementRef.nativeElement;
+    this.accordion = undefined;
+    this.tooltip = '';
+  }
+
+  ngAfterContentInit() {
+     this.jqTooltip = $(this.domElement).find('.jquilar-tooltip');
+      $(this.jqTooltip).attr('title', this.tooltip);
+      $(this.jqTooltip).tooltip();
+  }
+
+  ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
+    for (let change in changes) {
+      this[change] = changes[change] ? changes[change].currentValue : this[change];
+    }
+     this.jqTooltip = $(this.domElement).find('.jquilar-tooltip');
+      $(this.jqTooltip).attr('title', this.tooltip);
+      $(this.jqTooltip).tooltip();
   }
 }
