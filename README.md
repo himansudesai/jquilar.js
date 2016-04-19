@@ -16,6 +16,10 @@ Currently tested with:
 - Date Picker
 - Progress Bar
 - Sortable
+- Menu
+- Effect
+- Accordion
+- Tooltip
 
 
 The examples can be viewed online at himansudesai.github.com/jquilar
